@@ -1,88 +1,47 @@
-//
-//  DiaryDetail.swift
-//  MoodTracker
-//
-//  Created by Yujin on 12/9/24.
-//
 import SwiftUI
 
 struct DiaryDetail: View {
     var diary: Diary
     @Environment(\.managedObjectContext) private var viewContext
-    @State private var isEditing = false
-    @State private var editedContent: String
-
-    init(diary: Diary) {
-        self.diary = diary
-        _editedContent = State(initialValue: diary.content ?? "")
-    }
-
+    
     var body: some View {
-         ZStack {
-             Color("BGColor")
-                 .ignoresSafeArea()
-
-             VStack(alignment: .leading) {
-                 Text(diary.date ?? Date(), style: .date)
-                     .font(.title)
-                     .bold()
-                 
-                 Text(formatTime(from: diary.date ?? Date()))
-                     .font(.title3)
-                     .foregroundColor(.gray)
-                     .padding(.bottom)
-
-                 Image(moodImageName(for: diary.mood))
-                     .resizable()
-                     .scaledToFit()
-                     .frame(width: 100, height: 100)
-                     .frame(maxWidth: .infinity, alignment: .center)
-                     .cornerRadius(10)
-                     .padding()
-
-                // ScrollView moved to correct place
-                 ScrollView {
-                    if isEditing {
-                        // Edit mode - TextEditor for content editing
-                        TextEditor(text: $editedContent)
-                            .font(.body)
-                            .foregroundColor(.primary)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .padding()
-                            .border(Color.gray, width: 1)
-                    } else {
-                        // Display content
-                        Text(diary.content ?? "")
-                            .font(.body)
-                            .foregroundColor(.primary)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .padding()
-                    }
-                }
-             }
-             .padding()
-             .background(Color.white)
-             .cornerRadius(20)
-             .padding()
-             .navigationBarTitleDisplayMode(.inline)
-             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        if isEditing {
-                            // Save edited content when exiting edit mode
-                            diary.content = editedContent
-                            try? viewContext.save()
-                        }
-                        isEditing.toggle() // Toggle between edit and view modes
-                    }) {
-                        Text(isEditing ? "Save" : "Edit")
-                            .fontWeight(.semibold)
-                            .foregroundColor(.blue)
-                    }
+        ZStack {
+            Color("BGColor")
+                .ignoresSafeArea()
+            
+            VStack(alignment: .leading) {
+                Text(diary.date ?? Date(), style: .date)
+                    .font(.title3)
+                    .bold()
+                
+                Text(formatTime(from: diary.date ?? Date()))
+                    .font(.title3)
+                    .foregroundColor(.gray)
+                    .padding(.bottom)
+                
+                Image(moodImageName(for: diary.mood))
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 100, height: 100)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .cornerRadius(10)
+                    .padding()
+                
+                ScrollView {
+                    Text(diary.content ?? "")
+                        .font(.body)
+                        .foregroundColor(.primary)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding()
                 }
             }
-         }
-     }
+            .padding()
+            .background(Color.white)
+            .cornerRadius(20)
+            .padding()
+            .navigationBarTitleDisplayMode(.inline)
+        }
+    }
 
     private func moodImageName(for mood: Int32) -> String {
         switch mood {
@@ -121,8 +80,8 @@ struct DiaryDetail_Previews: PreviewProvider {
             print("Error saving preview data: \(error.localizedDescription)")
         }
         
-        // Return the DiaryDetail view with the mock data
+
         return DiaryDetail(diary: newDiary)
-            .environment(\.managedObjectContext, context) // Provide the context
+            .environment(\.managedObjectContext, context) 
     }
 }

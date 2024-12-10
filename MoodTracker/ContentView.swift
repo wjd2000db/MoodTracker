@@ -19,13 +19,13 @@ struct ContentView: View {
         TabView(selection: $menu){
             AddDiaryView()
                 .tabItem{
-                    Label("New", systemImage: "note.text")
+                    Label(LocalizedStringKey("New"), systemImage: "note.text")
                 }
                 .tag(Tab.home)
             
             DiaryRow()
                 .tabItem{
-                    Label("Record", systemImage: "list.bullet")
+                    Label(LocalizedStringKey("List"), systemImage: "list.bullet")
                 }
                 .tag(Tab.list)
         }

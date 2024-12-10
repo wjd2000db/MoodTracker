@@ -28,7 +28,7 @@ struct AddDiaryView: View {
             Color("BGColor")
                 .ignoresSafeArea()
             VStack {
-                Text("How Was Your Day?")
+                Text(LocalizedStringKey("Title"))
                     .font(.title2)
                     .foregroundColor(Color("FontColor"))
                     .bold()
@@ -55,7 +55,7 @@ struct AddDiaryView: View {
                 Button(action: {
                        saveDiary()
                    }) {
-                       Text("Save")
+                       Text(LocalizedStringKey("Save"))
                            .font(.headline)
                            .foregroundColor(.white)
                            .padding()
@@ -89,6 +89,7 @@ struct AddDiaryView: View {
         do {
             try viewContext.save()
             alertMessage = "Diary saved successfully!"
+            diaryText = "" 
             showAlert = true
         } catch {
             alertMessage = "Failed to save diary: \(error.localizedDescription)"

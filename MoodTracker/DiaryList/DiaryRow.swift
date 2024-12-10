@@ -5,50 +5,57 @@ struct DiaryRow: View {
     private var viewContext
     
     @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Diary.date, ascending: true)],
+        sortDescriptors: [NSSortDescriptor(keyPath: \Diary.date, ascending: false)],
         animation: .default)
     private var diaries: FetchedResults<Diary>
 
     var body: some View {
-        ZStack {
-            Color("BGColor")
-                .ignoresSafeArea()
-            
-            VStack {
-                ForEach(diaries, id: \.self) { diary in
-                    NavigationLink(destination: DiaryDetail(diary: diary)) {
-                        VStack(alignment: .leading) {
-                            Text(diary.date ?? Date(), style: .date)
-                                .font(.headline)
-                            
-                            Text(formatTime(from: diary.date ?? Date()))
-                                .font(.caption)
-                                .foregroundColor(.gray)
-                            
-                            Image(moodImageName(for: diary.mood))
-                                .resizable()
-                                .frame(width: 50, height: 50)
-                                .cornerRadius(10)
-                                .frame(maxWidth: .infinity, alignment: .center)
+        NavigationView {
+            ZStack {
+                Color("BGColor")
+                    .ignoresSafeArea()
+             
+                ScrollView {
+                    VStack {
+                        ShowAdvice()
+                        
+                        ForEach(diaries, id: \.self) { diary in
+                            NavigationLink(destination: DiaryDetail(diary: diary)) {
+                                VStack(alignment: .leading) {
+                                    Text(diary.date ?? Date(), style: .date)
+                                        .font(.headline)
+                                        .foregroundColor(.black)
+                                    
+                                    Text(formatTime(from: diary.date ?? Date()))
+                                        .font(.caption)
+                                        .foregroundColor(.gray)
+                                    
+                                    Image(moodImageName(for: diary.mood))
+                                        .resizable()
+                                        .frame(width: 50, height: 50)
+                                        .cornerRadius(10)
+                                        .frame(maxWidth: .infinity, alignment: .center)
+                                        .padding()
+                                    
+                                    Text(diary.content ?? "")
+                                        .font(.footnote)
+                                        .lineLimit(3)
+                                        .multilineTextAlignment(.center)
+                                        .foregroundColor(.secondary)
+                                        .frame(maxWidth: .infinity, alignment: .center)
+                                }
                                 .padding()
-                            
-                            Text(diary.content ?? "")
-                                .font(.footnote)
-                                .lineLimit(3)
-                                .multilineTextAlignment(.center)
-                                .foregroundColor(.secondary)
-                                .frame(maxWidth: .infinity, alignment: .center)
+                                .background(Color.white)
+                                .cornerRadius(10)
+                                .shadow(radius: 5)
+                                .padding(.horizontal)
+                            }
                         }
-                        .padding()
-                        .background(Color.white)
-                        .cornerRadius(10)
-                        .shadow(radius: 5)
-                        .padding(.horizontal)
                     }
                 }
             }
+            .scrollContentBackground(.hidden)
         }
-        .scrollContentBackground(.hidden)
     }
     
     private func moodImageName(for mood: Int32) -> String {
