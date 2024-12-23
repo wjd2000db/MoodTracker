@@ -17,6 +17,12 @@
         }
       }
     },
+    "Delete" : {
+
+    },
+    "Edit" : {
+
+    },
     "List" : {
       "extractionState" : "manual",
       "localizations" : {

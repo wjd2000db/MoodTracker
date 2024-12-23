@@ -3,6 +3,14 @@ import SwiftUI
 struct DiaryDetail: View {
     var diary: Diary
     @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.dismiss) private var dismiss
+    @State private var isEditing: Bool = false
+    @State private var editedContent: String
+    
+    init(diary: Diary) {
+        self.diary = diary
+        _editedContent = State(initialValue: diary.content ?? "") 
+    }
     
     var body: some View {
         ZStack {
@@ -27,13 +35,61 @@ struct DiaryDetail: View {
                     .cornerRadius(10)
                     .padding()
                 
+
                 ScrollView {
-                    Text(diary.content ?? "")
-                        .font(.body)
-                        .foregroundColor(.primary)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding()
+                    if isEditing {
+                        TextEditor(text: $editedContent)
+                            .frame(height: 250)
+                            .padding()
+                            .background(
+                                    RoundedRectangle(cornerRadius: 10)  // 둥근 테두리 설정
+                                        .stroke(Color("ButtonColor"), lineWidth: 2) // 테두리 색깔을 "ButtonColor"로 설정
+                                )
+                            .padding()
+                    }else {
+                        Text(diary.content ?? "")
+                            .font(.body)
+                            .foregroundColor(.primary)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding()
+                    }
+                    
                 }
+             
+                HStack {
+                    if isEditing {
+                        Spacer()
+                        
+                        Button("Save") {
+                            saveChanges()
+                        }
+                        .padding()
+                        .background(Color("ButtonColor"))
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                        
+                        Spacer()
+                    } else {
+                    Button("Edit") {
+                           isEditing.toggle()
+                       }
+                       .padding()
+                       .background(Color("ButtonColor"))
+                       .foregroundColor(.white)
+                       .cornerRadius(10)
+                       
+                      Spacer()
+                           
+                       Button("Delete") {
+                           deleteDiary()
+                       }
+                       .padding()
+                       .background(Color("ButtonColor"))
+                       .foregroundColor(.white)
+                       .cornerRadius(10)
+                    }
+                }
+                .padding(.top)
             }
             .padding()
             .background(Color.white)
@@ -41,6 +97,19 @@ struct DiaryDetail: View {
             .padding()
             .navigationBarTitleDisplayMode(.inline)
         }
+        
+    }
+    
+    private func deleteDiary() {
+        viewContext.delete(diary)
+           
+           do {
+               try viewContext.save()
+               dismiss()
+               print("Diary deleted")
+               } catch {
+                   print("Error deleting diary: \(error.localizedDescription)")
+           }
     }
 
     private func moodImageName(for mood: Int32) -> String {
@@ -61,14 +130,23 @@ struct DiaryDetail: View {
         formatter.dateFormat = "hh:mm a"
         return formatter.string(from: date)
     }
+
+    private func saveChanges() {
+        diary.content = editedContent
+        
+        do {
+            try viewContext.save()
+            isEditing = false 
+        } catch {
+            print("Error saving diary: \(error.localizedDescription)")
+        }
+    }
 }
 
 struct DiaryDetail_Previews: PreviewProvider {
     static var previews: some View {
-        // Create an in-memory context for the preview
         let context = PersistenceController(inMemory: true).viewContext
         
-        // Insert example data into the context
         let newDiary = Diary(context: context)
         newDiary.date = Date()
         newDiary.mood = 2
@@ -80,8 +158,7 @@ struct DiaryDetail_Previews: PreviewProvider {
             print("Error saving preview data: \(error.localizedDescription)")
         }
         
-
         return DiaryDetail(diary: newDiary)
-            .environment(\.managedObjectContext, context) 
+            .environment(\.managedObjectContext, context)
     }
 }
